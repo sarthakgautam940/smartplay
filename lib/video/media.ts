@@ -4,11 +4,56 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-import ffmpegPath from "ffmpeg-static";
-import ffprobeStatic from "ffprobe-static";
-
 import { getS3Object, parseStorageObjectKeyFromUrl } from "@/lib/storage";
 import { formatTimestampLabel, isVideoFile } from "@/lib/video/utils";
+
+// ffmpeg-static and ffprobe-static are optional dependencies so CI / preview
+// builds don't have to download ~50MB of platform binaries. When they're
+// absent the video-analysis surfaces throw a helpful runtime error instead of
+// failing the build.
+type FfmpegStaticModule = { default: string | null };
+type FfprobeStaticModule = { default: { path: string } };
+
+let ffmpegPathPromise: Promise<string> | null = null;
+let ffprobePathPromise: Promise<string> | null = null;
+
+async function resolveFfmpegPath(): Promise<string> {
+  if (!ffmpegPathPromise) {
+    ffmpegPathPromise = import("ffmpeg-static")
+      .then((mod: FfmpegStaticModule) => {
+        if (!mod.default) {
+          throw new Error("ffmpeg-static resolved to null on this platform.");
+        }
+        return mod.default;
+      })
+      .catch((error: Error) => {
+        ffmpegPathPromise = null;
+        throw new Error(
+          `Video analysis is unavailable: ffmpeg-static is not installed. ${error.message}`,
+        );
+      });
+  }
+  return ffmpegPathPromise;
+}
+
+async function resolveFfprobePath(): Promise<string> {
+  if (!ffprobePathPromise) {
+    ffprobePathPromise = import("ffprobe-static")
+      .then((mod: FfprobeStaticModule) => {
+        if (!mod.default?.path) {
+          throw new Error("ffprobe-static resolved without a binary path.");
+        }
+        return mod.default.path;
+      })
+      .catch((error: Error) => {
+        ffprobePathPromise = null;
+        throw new Error(
+          `Video analysis is unavailable: ffprobe-static is not installed. ${error.message}`,
+        );
+      });
+  }
+  return ffprobePathPromise;
+}
 
 type LocalMediaKind = "video" | "image";
 
@@ -198,7 +243,8 @@ export async function probeLocalMedia(
   fileUrl: string,
   mimeType?: string | null,
 ): Promise<LocalMediaProbe> {
-  const stdout = await runBinary(ffprobeStatic.path, [
+  const ffprobeBinary = await resolveFfprobePath();
+  const stdout = await runBinary(ffprobeBinary, [
     "-v",
     "error",
     "-select_streams",
@@ -290,13 +336,14 @@ export async function extractSampleFrames({
 
   const timestamps = selectSampleSeconds(durationSeconds, sampleCount);
   const frames: ExtractedFrame[] = [];
+  const ffmpegBinary = await resolveFfmpegPath();
 
   for (let index = 0; index < timestamps.length; index += 1) {
     const timestampSeconds = timestamps[index] ?? 0;
     const fileName = `frame-${index + 1}.jpg`;
     const outputPath = path.join(outputDir, fileName);
 
-    await runBinary(ffmpegPath as string, [
+    await runBinary(ffmpegBinary, [
       "-y",
       "-ss",
       String(timestampSeconds),

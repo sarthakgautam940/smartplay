@@ -2,6 +2,7 @@
 
 import {
   motion,
+  useInView,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -12,51 +13,22 @@ import {
   ArrowUpRight,
   Brain,
   CalendarDays,
-  CheckCircle2,
   Dumbbell,
   HeartPulse,
   Salad,
-  ShieldCheck,
-  Target,
-  Users,
   Video,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { Reveal } from "@/components/marketing/motion-primitives";
+import { RoleLensSection } from "@/components/marketing/role-lens-section";
 import { ScrollFillNumber } from "@/components/marketing/scroll-fill-number";
 import { TransitionLink } from "@/components/marketing/transition-link";
+import { useScrollVelocity } from "@/components/marketing/use-scroll-velocity";
 
 /* ──────────────────────────────────────────────────────────────
    Section data
    ────────────────────────────────────────────────────────────── */
-
-const rolePaths = [
-  {
-    role: "Athlete",
-    icon: Target,
-    line: "Know the next useful rep.",
-    detail:
-      "Sessions, recovery, nutrition, mindset, goals, and film stay tied to the week the athlete is actually living.",
-    cue: "Start the trial",
-  },
-  {
-    role: "Coach",
-    icon: Users,
-    line: "Scan the roster without noise.",
-    detail:
-      "Readiness, submitted clips, session trends, and drill assignments become quick coaching decisions.",
-    cue: "Pilot team workflows",
-  },
-  {
-    role: "Parent",
-    icon: ShieldCheck,
-    line: "Support without taking over.",
-    detail:
-      "High-level visibility on schedule, recovery, and goals — without parents becoming a second coach.",
-    cue: "Trust the big picture",
-  },
-];
 
 const weekLoop = [
   {
@@ -99,9 +71,21 @@ const signalGrid = [
 ];
 
 const aiCues = [
-  "Plant foot set earlier before the finish.",
-  "Protect technique once fatigue appears late.",
-  "Repeat the cleaner approach angle tomorrow.",
+  {
+    label: "Cue A",
+    title: "Plant foot set earlier before the finish.",
+    meta: "00:14 · high confidence",
+  },
+  {
+    label: "Cue B",
+    title: "Protect technique once fatigue appears late.",
+    meta: "00:42 · medium confidence",
+  },
+  {
+    label: "Cue C",
+    title: "Repeat the cleaner approach angle tomorrow.",
+    meta: "01:08 · labeled lower",
+  },
 ];
 
 /* ──────────────────────────────────────────────────────────────
@@ -111,7 +95,7 @@ const aiCues = [
 export function HomeSections() {
   return (
     <>
-      <RolesSection />
+      <RoleLensSection />
       <WeekLoopSection />
       <AIProofSection />
       <ConnectedSignalsSection />
@@ -121,137 +105,7 @@ export function HomeSections() {
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Roles — chalk surface. Entry is a single linear scroll motion.
-   Seam with the pitch hero above is deliberate, not a blur hack.
-   ────────────────────────────────────────────────────────────── */
-
-function RolesSection() {
-  const reduceMotion = useReducedMotion();
-  const sectionRef = useRef<HTMLElement | null>(null);
-
-  // Two scroll observers, two independent jobs:
-  //   • `scrollYProgress` — entry of the section, drives card lift.
-  //   • `parallaxProgress` — the section's whole journey through the viewport,
-  //      drives a strong upward parallax on the section itself, so the chalk
-  //      surface rises faster than the natural scroll and fully covers the
-  //      dark proof rail above. No blurred seam, no muddy overlap — just the
-  //      chalk pulling up over the dark behind it.
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "start 40%"],
-  });
-  const { scrollYProgress: parallaxProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const cardsY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    reduceMotion ? [0, 0] : [40, 0],
-  );
-
-  // Section rises 160px over its full passage — overscroll-style cover.
-  const sectionY = useTransform(
-    parallaxProgress,
-    [0, 1],
-    reduceMotion ? [0, 0] : [0, -160],
-  );
-
-  return (
-    <motion.section
-      ref={sectionRef}
-      data-surface="light"
-      style={{ y: sectionY, willChange: "transform" }}
-      className="surface-chalk relative py-24 sm:py-32"
-    >
-      {/* Intentional chapter seam — oversized "02" straddles the boundary
-          with the pitch hero above, and fills from outline → lime as the
-          section scrolls into view. No blur, no muddy band. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-0 right-0 top-0 flex justify-center overflow-hidden"
-        style={{ height: 0 }}
-      >
-        <div style={{ transform: "translateY(-70%)" }}>
-          <ScrollFillNumber
-            size="clamp(6rem, 14vw, 12rem)"
-            letterSpacing="-0.05em"
-            outlineColor="rgba(181, 255, 93, 0.4)"
-          >
-            02
-          </ScrollFillNumber>
-        </div>
-      </div>
-
-      <div className="section-shell">
-        <div className="grid gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
-          <div>
-            <div className="kicker kicker-pitch">Chapter 02 · Support triangle</div>
-            <h2 className="headline mt-5 max-w-[16ch] text-[clamp(2.4rem,4.4vw,3.75rem)] text-[var(--on-chalk-1)]">
-              Athlete effort. Coach clarity. Parent trust.
-            </h2>
-            <p className="mt-6 max-w-md text-[1.02rem] leading-7 text-[var(--on-chalk-3)]">
-              Three people shape every youth soccer season. Smartplay gives
-              each one a different view of the same week — so the athlete
-              stays in charge of their development.
-            </p>
-          </div>
-
-          <motion.div
-            style={{ y: cardsY }}
-            className="grid gap-4 md:grid-cols-3"
-          >
-            {rolePaths.map((path, index) => (
-              <RoleCard key={path.role} path={path} index={index} />
-            ))}
-          </motion.div>
-        </div>
-      </div>
-    </motion.section>
-  );
-}
-
-function RoleCard({
-  path,
-  index,
-}: {
-  path: (typeof rolePaths)[number];
-  index: number;
-}) {
-  const Icon = path.icon;
-  return (
-    <div className="card-chalk group relative flex h-full flex-col p-6 transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_30px_60px_-30px_rgba(6,16,11,0.25)]">
-      <div className="flex items-center justify-between">
-        <div className="grid size-10 place-items-center rounded-[10px] bg-[var(--pitch)] text-[var(--lime)]">
-          <Icon className="size-5" strokeWidth={2} />
-        </div>
-        <span className="mono-xs uppercase text-[var(--on-chalk-4)]">
-          0{index + 1}
-        </span>
-      </div>
-      <div className="headline mt-8 text-[1.7rem] text-[var(--on-chalk-1)]">
-        {path.role}
-      </div>
-      <div className="mt-2 text-[0.95rem] font-semibold text-[var(--on-chalk-2)]">
-        {path.line}
-      </div>
-      <p className="mt-3 text-[0.9rem] leading-7 text-[var(--on-chalk-3)]">
-        {path.detail}
-      </p>
-      <div className="mt-auto flex items-center gap-1.5 pt-7 text-[0.82rem] font-bold text-[var(--on-chalk-1)] transition-[gap] group-hover:gap-2.5">
-        {path.cue}
-        <ArrowUpRight
-          className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          strokeWidth={2.6}
-        />
-      </div>
-    </div>
-  );
-}
-
-/* ──────────────────────────────────────────────────────────────
-   Week loop — pitch surface, sequential reveal on rail. Preserved.
+   Week loop — pitch surface, sequential reveal on rail.
    ────────────────────────────────────────────────────────────── */
 
 function WeekLoopSection() {
@@ -266,20 +120,19 @@ function WeekLoopSection() {
     <section
       ref={ref}
       data-surface="dark"
-      className="surface-pitch-gradient relative py-28 sm:py-36"
+      className="surface-pitch-gradient relative section-pad"
     >
       <div className="section-shell">
         <div className="grid gap-16 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
           <div className="lg:sticky lg:top-28">
             <Reveal>
-              <div className="kicker kicker-lime">Chapter 03 · The week loop</div>
-              <h2 className="headline mt-5 max-w-[15ch] text-[clamp(2.4rem,4.4vw,3.75rem)] text-white">
+              <div className="kicker kicker-lime">The week loop</div>
+              <h2 className="t-display-sm mt-5 max-w-[15ch] text-balance text-white">
                 Scroll feels like the season clicking into place.
               </h2>
-              <p className="mt-6 max-w-md text-[1.02rem] leading-7 text-white/60">
-                The product is the rhythm: log the work, read the body, review
-                the clip, adjust before the next session. Each beat unlocks as
-                you move down the page.
+              <p className="t-lede mt-6 max-w-md text-pretty text-white/62">
+                Log the work, read the body, review the clip, adjust before the
+                next session. Each beat unlocks as you move down the page.
               </p>
             </Reveal>
             <Reveal delay={0.08}>
@@ -410,132 +263,270 @@ function WeekLoopItem({
 }
 
 /* ──────────────────────────────────────────────────────────────
-   AI proof — scroll-linked scrub bars + film card. Preserved.
+   AI proof — chapter 4. Mechanical entrance (corner brackets →
+   body → comet ignite). Comet-glow perimeter whose angle is
+   driven by scroll velocity with momentum (slow baseline at rest,
+   accelerates with scroll, reverses on scroll-up). Three right-
+   side cues stagger in from the lower-right on scroll-down; when
+   the user scrolls past, they tilt + dim rather than reversing.
    ────────────────────────────────────────────────────────────── */
 
 function AIProofSection() {
   const ref = useRef<HTMLElement | null>(null);
+  const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start 80%", "end 30%"],
   });
 
-  const bar1 = useTransform(scrollYProgress, [0.0, 0.55], [0, 0.72]);
-  const bar2 = useTransform(scrollYProgress, [0.18, 0.75], [0, 0.5]);
-  const bar3 = useTransform(scrollYProgress, [0.35, 0.92], [0, 0.85]);
+  // Clip scrub bars — scroll-driven
+  const bar1 = useTransform(scrollYProgress, [0.05, 0.55], [0, 0.72]);
+  const bar2 = useTransform(scrollYProgress, [0.2, 0.75], [0, 0.5]);
+  const bar3 = useTransform(scrollYProgress, [0.35, 0.9], [0, 0.85]);
+  const t1Sec = useTransform(scrollYProgress, [0.05, 0.55], [0, 14]);
+  const t2Sec = useTransform(scrollYProgress, [0.2, 0.75], [0, 42]);
+  const t3Sec = useTransform(scrollYProgress, [0.35, 0.9], [0, 68]);
 
-  const t1Sec = useTransform(scrollYProgress, [0.0, 0.55], [0, 14]);
-  const t2Sec = useTransform(scrollYProgress, [0.18, 0.75], [0, 42]);
-  const t3Sec = useTransform(scrollYProgress, [0.35, 0.92], [0, 68]);
+  // Mechanical entrance stages
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(frameRef, { margin: "-20% 0px -20% 0px", once: true });
+  const [stage, setStage] = useState(0); // 0 hidden → 1 corners → 2 body → 3 glow
+  useEffect(() => {
+    if (!inView) return;
+    if (reduceMotion) {
+      setStage(3);
+      return;
+    }
+    const t1 = window.setTimeout(() => setStage(1), 40);
+    const t2 = window.setTimeout(() => setStage(2), 320);
+    const t3 = window.setTimeout(() => setStage(3), 760);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
+    };
+  }, [inView, reduceMotion]);
+
+  // Comet angle, driven by scroll velocity with momentum
+  const { subscribe } = useScrollVelocity({ baseline: 14, boost: 1.4, max: 180 });
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el || reduceMotion) return;
+    let angle = 0;
+    let last = performance.now();
+    let currentDps = 14; // stored dps value
+    const unsub = subscribe((dps) => {
+      currentDps = dps;
+    });
+    let raf = 0;
+    const tick = (now: number) => {
+      const dt = Math.min(64, now - last) / 1000;
+      last = now;
+      angle = (angle + currentDps * dt) % 360;
+      el.style.setProperty("--comet-angle", `${angle.toFixed(2)}deg`);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      unsub();
+    };
+  }, [subscribe, reduceMotion]);
 
   return (
     <section
       ref={ref}
       data-surface="light"
-      className="surface-chalk relative overflow-hidden py-24 sm:py-32"
+      className="surface-chalk relative overflow-hidden section-pad"
     >
       <div className="section-shell">
         <div className="grid gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          {/* LEFT — coachable-moments card */}
           <div className="order-2 lg:order-1">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              data-surface="dark"
-              className="relative overflow-hidden rounded-2xl bg-[var(--pitch)] p-6 text-white sm:p-8"
-              style={{
-                boxShadow:
-                  "0 40px 100px -50px rgba(6,16,11,0.4), inset 0 0 0 1px rgba(255,255,255,0.06)",
-              }}
+            <div
+              ref={frameRef}
+              className="mech-frame comet-frame relative"
+              data-stage={stage}
+              style={
+                {
+                  "--comet-opacity": stage >= 3 ? 0.9 : 0,
+                } as CSSProperties
+              }
             >
+              <span className="mech-corner tl" aria-hidden="true" />
+              <span className="mech-corner tr" aria-hidden="true" />
+              <span className="mech-corner bl" aria-hidden="true" />
+              <span className="mech-corner br" aria-hidden="true" />
+
               <div
-                aria-hidden="true"
-                className="grid-pitch absolute inset-0 opacity-50"
+                data-surface="dark"
+                className="mech-body relative overflow-hidden rounded-2xl p-6 text-white sm:p-8"
                 style={{
-                  maskImage:
-                    "linear-gradient(180deg, black 0%, transparent 78%)",
+                  background:
+                    "linear-gradient(180deg, #0d1a15 0%, #0a1613 58%, #0b1812 100%)",
+                  boxShadow:
+                    "0 40px 100px -50px rgba(6,16,11,0.45), inset 0 0 0 1px rgba(255,255,255,0.06)",
                 }}
-              />
-              <div className="relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="mono-xs uppercase text-white/45">
-                      Clip · 1:32 review
+              >
+                <div
+                  aria-hidden="true"
+                  className="grid-pitch absolute inset-0 opacity-[0.35]"
+                  style={{
+                    maskImage:
+                      "linear-gradient(180deg, black 0%, transparent 78%)",
+                  }}
+                />
+                <div className="relative">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="mono-xs uppercase text-white/45">
+                        Clip · 1:32 review
+                      </div>
+                      <div className="t-h3 mt-2 text-white">
+                        Three coachable moments
+                      </div>
                     </div>
-                    <div className="headline mt-2 text-[1.65rem] text-white">
-                      Three coachable moments
+                    <div className="grid size-11 place-items-center rounded-[10px] border border-[var(--lime)]/20 bg-[var(--lime)]/6 text-[var(--lime)]">
+                      <Video className="size-5" strokeWidth={1.8} />
                     </div>
                   </div>
-                  <Video className="size-7 text-[var(--lime)]" />
-                </div>
 
-                <div className="mt-7 space-y-4">
-                  <ScrubBar
-                    label="Approach angle"
-                    confidence="high"
-                    color="var(--lime)"
-                    progress={bar1}
-                    totalSec={t1Sec}
-                  />
-                  <ScrubBar
-                    label="Late fatigue cue"
-                    confidence="medium"
-                    color="var(--amber)"
-                    progress={bar2}
-                    totalSec={t2Sec}
-                  />
-                  <ScrubBar
-                    label="Press trigger window"
-                    confidence="labeled lower"
-                    color="var(--ice)"
-                    progress={bar3}
-                    totalSec={t3Sec}
-                  />
-                </div>
-
-                <div className="hair-divider mt-7" />
-
-                <div className="mt-6 rounded-xl border border-white/8 bg-white/[0.03] p-4 text-[0.9rem] leading-6 text-white/70">
-                  <div className="mono-xs uppercase text-[var(--lime)]/80">
-                    Smartplay says
+                  <div className="mt-7 space-y-4">
+                    <ScrubBar
+                      label="Approach angle"
+                      confidence="high"
+                      color="var(--lime)"
+                      progress={bar1}
+                      totalSec={t1Sec}
+                    />
+                    <ScrubBar
+                      label="Late fatigue cue"
+                      confidence="medium"
+                      color="var(--amber)"
+                      progress={bar2}
+                      totalSec={t2Sec}
+                    />
+                    <ScrubBar
+                      label="Press trigger window"
+                      confidence="labeled lower"
+                      color="var(--ice)"
+                      progress={bar3}
+                      totalSec={t3Sec}
+                    />
                   </div>
-                  <p className="mt-2">
-                    Cleaner first touch protects the final 15 minutes. Repeat
-                    the approach angle from 00:14 tomorrow.
-                  </p>
+
+                  <div className="hair-divider mt-7" />
+
+                  <div className="mt-6 rounded-xl border border-white/8 bg-white/[0.03] p-4 text-[0.9rem] leading-6 text-white/72">
+                    <div className="mono-xs uppercase text-[var(--lime)]/85">
+                      Smartplay says
+                    </div>
+                    <p className="mt-2">
+                      Cleaner first touch protects the final 15 minutes. Repeat
+                      the approach angle from 00:14 tomorrow.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
+          {/* RIGHT — headline + three coaching-cue boxes */}
           <div className="order-1 lg:order-2">
             <Reveal>
-              <div className="kicker kicker-pitch">Chapter 04 · Honest AI</div>
-              <h2 className="headline mt-5 max-w-[18ch] text-[clamp(2.4rem,4.4vw,3.75rem)] text-[var(--on-chalk-1)]">
+              <div className="kicker kicker-pitch">Honest AI</div>
+              <h2 className="t-display-sm mt-5 max-w-[18ch] text-balance text-[var(--on-chalk-1)]">
                 AI is useful here because it stays inside the work.
               </h2>
-              <p className="mt-6 max-w-lg text-[1.02rem] leading-7 text-[var(--on-chalk-3)]">
+              <p className="t-lede mt-6 max-w-lg text-pretty text-[var(--on-chalk-3)]">
                 Smartplay samples clips, reads athlete context, and produces
                 structured coaching points. When the model has less to work
                 with, it labels the uncertainty plainly — instead of pretending
                 to know.
               </p>
-              <div className="mt-8 grid gap-3">
-                {aiCues.map((cue) => (
-                  <Reveal key={cue} delay={0.08}>
-                    <div className="flex gap-3 rounded-xl border border-[var(--on-chalk-1)]/8 bg-white/70 p-4 text-[0.92rem] leading-6 text-[var(--on-chalk-2)]">
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[var(--pitch)]" />
-                      <span>{cue}</span>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
             </Reveal>
+
+            <div className="mt-8 grid gap-3">
+              {aiCues.map((cue, i) => (
+                <AICueCard
+                  key={cue.title}
+                  cue={cue}
+                  index={i}
+                  scrollYProgress={scrollYProgress}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────────
+   AI cue card — directional in/out.
+   Entry (downward scroll through section):
+     translate (24, 18) → (0, 0), opacity 0 → 1
+   Exit (continuing past section):
+     rotate 0 → 2°, opacity 1 → 0.42 — not a reverse of the entry.
+   ────────────────────────────────────────────────────────────── */
+function AICueCard({
+  cue,
+  index,
+  scrollYProgress,
+}: {
+  cue: (typeof aiCues)[number];
+  index: number;
+  scrollYProgress: MotionValue<number>;
+}) {
+  const reduceMotion = useReducedMotion();
+  const entryStart = 0.18 + index * 0.08;
+  const entryEnd = entryStart + 0.12;
+  const exitStart = 0.78;
+  const exitEnd = 0.96;
+
+  const opacity = useTransform(
+    scrollYProgress,
+    [entryStart, entryEnd, exitStart, exitEnd],
+    reduceMotion ? [1, 1, 1, 1] : [0, 1, 1, 0.42],
+  );
+  const x = useTransform(
+    scrollYProgress,
+    [entryStart, entryEnd],
+    reduceMotion ? [0, 0] : [24, 0],
+  );
+  const y = useTransform(
+    scrollYProgress,
+    [entryStart, entryEnd],
+    reduceMotion ? [0, 0] : [18, 0],
+  );
+  const rotate = useTransform(
+    scrollYProgress,
+    [exitStart, exitEnd],
+    reduceMotion ? [0, 0] : [0, 2],
+  );
+
+  return (
+    <motion.div
+      style={{ opacity, x, y, rotate }}
+      className="group relative flex items-start gap-4 rounded-xl border border-[var(--on-chalk-1)]/8 bg-white/70 p-4 transition-[border-color,background] duration-300 hover:border-[var(--lime-deep)]/40 hover:bg-white"
+    >
+      <span className="mono-xs mt-1 shrink-0 rounded bg-[var(--pitch)] px-1.5 py-0.5 uppercase text-[var(--lime)] transition-transform duration-300 group-hover:scale-[1.06]">
+        {cue.label}
+      </span>
+      <div className="flex-1">
+        <p className="text-[0.95rem] leading-6 text-[var(--on-chalk-1)]">
+          {cue.title}
+        </p>
+        <div className="mono-xs mt-1 uppercase text-[var(--on-chalk-4)]">
+          {cue.meta}
+        </div>
+      </div>
+      <ArrowUpRight
+        className="mt-1 size-4 shrink-0 text-[var(--on-chalk-4)] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--on-chalk-1)]"
+        strokeWidth={2}
+      />
+    </motion.div>
   );
 }
 
@@ -608,18 +599,18 @@ function ConnectedSignalsSection() {
     <section
       ref={ref}
       data-surface="light"
-      className="surface-chalk relative py-28 sm:py-36"
+      className="surface-chalk relative section-pad"
     >
       <div className="section-shell">
         <motion.div
           style={{ y: titleY }}
           className="mx-auto max-w-[780px] text-center"
         >
-          <div className="kicker kicker-pitch">Chapter 05 · Design language</div>
-          <h2 className="headline mt-5 text-[clamp(2.4rem,4.4vw,3.75rem)] text-[var(--on-chalk-1)]">
+          <div className="kicker kicker-pitch">Design language</div>
+          <h2 className="t-display-sm mt-5 text-balance text-[var(--on-chalk-1)]">
             Every signal earns its place on the page.
           </h2>
-          <p className="mx-auto mt-6 max-w-xl text-[1rem] leading-7 text-[var(--on-chalk-3)]">
+          <p className="t-lede mx-auto mt-6 max-w-xl text-pretty text-[var(--on-chalk-3)]">
             Six product surfaces, one visual language. Color, motion, and
             hierarchy are tied to product meaning — not decoration.
           </p>
@@ -627,59 +618,79 @@ function ConnectedSignalsSection() {
 
         <div className="mt-16 overflow-hidden rounded-2xl border border-[var(--on-chalk-1)]/08">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {signalGrid.map((s, i) => {
-              const Icon = s.icon;
-              return (
-                <div
-                  key={s.label}
-                  className="group relative flex items-start gap-5 bg-white/55 p-8 transition-colors duration-300 hover:bg-white"
-                  style={{
-                    borderRight:
-                      (i + 1) % 3 !== 0 ? "1px solid rgba(6,16,11,0.08)" : "0",
-                    borderBottom:
-                      i < signalGrid.length - 3
-                        ? "1px solid rgba(6,16,11,0.08)"
-                        : "0",
-                  }}
-                >
-                  {/* Accent rail — thin lime line that grows on hover */}
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-0 top-8 bottom-8 w-[2px] origin-bottom scale-y-0 bg-[var(--lime)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100"
-                  />
-                  <div className="grid size-11 shrink-0 place-items-center rounded-[10px] bg-[var(--pitch)] text-[var(--on-pitch-1)] transition-colors duration-300 group-hover:text-[var(--lime)]">
-                    <Icon className="size-[22px]" strokeWidth={1.8} />
-                  </div>
-                  <div className="flex flex-1 items-start justify-between gap-4">
-                    <div>
-                      <ScrollFillNumber
-                        size="1.15rem"
-                        weight={700}
-                        letterSpacing="0.04em"
-                        outlineColor="rgba(6, 16, 11, 0.28)"
-                        fillColor="var(--pitch)"
-                      >
-                        {s.n}
-                      </ScrollFillNumber>
-                      <div className="headline mt-2 text-[1.3rem] text-[var(--on-chalk-1)]">
-                        {s.label}
-                      </div>
-                      <div className="mt-1 text-[0.85rem] text-[var(--on-chalk-3)]">
-                        {s.role}
-                      </div>
-                    </div>
-                    <ArrowUpRight
-                      className="mt-1 size-4 text-[var(--on-chalk-4)] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--on-chalk-1)]"
-                      strokeWidth={2}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+            {signalGrid.map((s, i) => (
+              <SignalTile key={s.label} s={s} i={i} total={signalGrid.length} />
+            ))}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/* Signal tile — diagonal wave stagger.
+   Row (i/3) and column (i%3) combine so tiles enter on a
+   descending-right wave instead of a single linear block. */
+function SignalTile({
+  s,
+  i,
+  total,
+}: {
+  s: (typeof signalGrid)[number];
+  i: number;
+  total: number;
+}) {
+  const reduceMotion = useReducedMotion();
+  const Icon = s.icon;
+  const row = Math.floor(i / 3);
+  const col = i % 3;
+  const delay = reduceMotion ? 0 : (row + col) * 0.07;
+
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.52, delay, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative flex items-start gap-5 bg-white/55 p-8 transition-colors duration-300 hover:bg-white"
+      style={{
+        borderRight:
+          (i + 1) % 3 !== 0 ? "1px solid rgba(6,16,11,0.08)" : "0",
+        borderBottom:
+          i < total - 3 ? "1px solid rgba(6,16,11,0.08)" : "0",
+      }}
+    >
+      <span
+        aria-hidden="true"
+        className="absolute left-0 top-8 bottom-8 w-[2px] origin-bottom scale-y-0 bg-[var(--lime)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100"
+      />
+      <div className="grid size-11 shrink-0 place-items-center rounded-[10px] bg-[var(--pitch)] text-[var(--on-pitch-1)] transition-colors duration-300 group-hover:text-[var(--lime)]">
+        <Icon className="size-[22px]" strokeWidth={1.8} />
+      </div>
+      <div className="flex flex-1 items-start justify-between gap-4">
+        <div>
+          <ScrollFillNumber
+            size="1.15rem"
+            weight={700}
+            letterSpacing="0.04em"
+            outlineColor="rgba(6, 16, 11, 0.28)"
+            fillColor="var(--pitch)"
+          >
+            {s.n}
+          </ScrollFillNumber>
+          <div className="t-h3 mt-2 text-[1.3rem] text-[var(--on-chalk-1)]">
+            {s.label}
+          </div>
+          <div className="mt-1 text-[0.85rem] text-[var(--on-chalk-3)]">
+            {s.role}
+          </div>
+        </div>
+        <ArrowUpRight
+          className="mt-1 size-4 text-[var(--on-chalk-4)] transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--on-chalk-1)]"
+          strokeWidth={2}
+        />
+      </div>
+    </motion.div>
   );
 }
 
@@ -707,7 +718,7 @@ function FinalCTASection() {
     <section
       ref={ref}
       data-surface="dark"
-      className="surface-pitch-gradient relative overflow-hidden py-24 sm:py-32"
+      className="surface-pitch-gradient relative overflow-hidden section-pad"
     >
       <motion.div
         aria-hidden="true"
@@ -715,7 +726,7 @@ function FinalCTASection() {
         style={{
           y: bgY,
           background:
-            "radial-gradient(60% 60% at 80% 20%, rgba(181,255,93,0.12) 0%, transparent 60%)",
+            "radial-gradient(58% 58% at 82% 22%, rgba(181,255,93,0.12) 0%, transparent 60%)",
           opacity: mounted ? 1 : 0,
         }}
       />
@@ -724,10 +735,10 @@ function FinalCTASection() {
           <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
               <div className="kicker kicker-lime">Ready when the athlete is</div>
-              <h2 className="headline mt-5 max-w-[20ch] text-[clamp(2.6rem,5vw,4.5rem)] text-white">
-                Start with one athlete profile. Let trust build from week one.
+              <h2 className="t-display mt-5 max-w-[18ch] text-balance text-white">
+                Start a week.
               </h2>
-              <p className="mt-6 max-w-xl text-[1.02rem] leading-7 text-white/62">
+              <p className="t-lede mt-6 max-w-xl text-pretty text-white/62">
                 Fourteen days, no card upfront. Build the profile, log a
                 session, upload a clip, and see the system actually fit your
                 week.
@@ -742,6 +753,9 @@ function FinalCTASection() {
                 Talk pilot fit
                 <CalendarDays className="size-4" />
               </TransitionLink>
+              <span className="mono-xs mt-1 uppercase text-white/42">
+                No card · $12/mo after
+              </span>
             </div>
           </div>
         </div>

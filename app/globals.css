@@ -76,15 +76,22 @@
 }
 
 html {
-  /* no smooth-scroll globally — it caused the first-scroll chop
-     (scroll-behavior interacts poorly with scroll-linked useTransform) */
+  /* no smooth-scroll globally — it caused the first-scroll chop */
   scroll-behavior: auto;
-  /* lock scrollbar gutter so entering pages don't cause layout shift */
   scrollbar-gutter: stable;
+  /* Fluid root font size: 13" MBP at zoom 100% reads with the same rhythm
+     as a 27" monitor. Floor prevents crushing on 320px phones; ceiling
+     prevents giantism on 4K. */
+  font-size: clamp(14.5px, 0.38vw + 13.4px, 17.25px);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
+  /* Pitch-dark base so the glass banner always shows pitch behind it,
+     regardless of which surface a page renders below it. Surface classes
+     override per section. */
+  background: var(--pitch);
   color: var(--foreground);
   font-family: var(--font-manrope), sans-serif;
   font-feature-settings: "ss01", "cv11";
@@ -94,8 +101,93 @@ body {
   text-wrap: balance;
 }
 
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Fluid horizontal padding. Scales from 1.25rem (20px) at 375w through
+   ~2vw at tablet to 3rem (48px) at 1440+. Max width opens to 88rem so
+   the design has more room on wide monitors without losing the center
+   axis on 13" laptops. */
 .section-shell {
-  @apply mx-auto w-full max-w-7xl px-5 sm:px-7 lg:px-10;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 88rem;
+  padding-inline: clamp(1.25rem, 2.4vw + 0.5rem, 3rem);
+}
+
+.section-shell-narrow {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: clamp(1.25rem, 2.4vw + 0.5rem, 3rem);
+}
+
+/* Fluid vertical rhythm for marketing sections */
+.section-pad {
+  padding-block: clamp(4rem, 7vw + 2rem, 8.5rem);
+}
+
+.section-pad-sm {
+  padding-block: clamp(2.75rem, 5vw + 1.25rem, 5.5rem);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Typography scale — named sizes with proper line-height + tracking
+   per size. Replaces scattered inline clamp() calls.
+   ────────────────────────────────────────────────────────────── */
+.t-display {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  font-size: clamp(2.75rem, 5.8vw + 0.5rem, 6.25rem);
+  letter-spacing: -0.034em;
+  line-height: 0.96;
+}
+
+.t-display-sm {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  font-size: clamp(2.25rem, 4.2vw + 0.5rem, 4.5rem);
+  letter-spacing: -0.028em;
+  line-height: 1.02;
+}
+
+.t-h2 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.75rem, 2.6vw + 0.6rem, 3rem);
+  letter-spacing: -0.022em;
+  line-height: 1.06;
+}
+
+.t-h3 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.35rem, 1.3vw + 0.75rem, 1.9rem);
+  letter-spacing: -0.016em;
+  line-height: 1.16;
+}
+
+.t-lede {
+  font-size: clamp(1.02rem, 0.6vw + 0.85rem, 1.2rem);
+  line-height: 1.55;
+  color: inherit;
+}
+
+.t-body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.t-caption {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  letter-spacing: 0.005em;
+}
+
+.t-mono {
+  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  font-feature-settings: "ss01", "tnum";
 }
 
 /* ──────────────────────────────────────────────────────────────
@@ -752,4 +844,274 @@ body {
     animation: none !important;
     stroke-dashoffset: 0 !important;
   }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Glass banner
+   Darkened pitch glass, slides up on scroll-down, returns on
+   scroll-up or cursor-proximity to the top 80px. Pitch shows
+   through the translucency regardless of page surface below.
+   ────────────────────────────────────────────────────────────── */
+.glass-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(6, 16, 11, 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--on-pitch-1);
+  transition:
+    transform 460ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+  will-change: transform;
+}
+
+.glass-banner[data-hidden="true"] {
+  transform: translateY(-102%);
+}
+
+.glass-banner[data-detached="true"] {
+  background: rgba(6, 16, 11, 0.86);
+  box-shadow: 0 18px 42px -28px rgba(0, 0, 0, 0.55);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Browsers without backdrop-filter fall back to a more opaque tint */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-banner {
+    background: rgba(6, 16, 11, 0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-banner {
+    transition: none;
+  }
+}
+
+/* Cursor-proximity hot zone at the top — invisible strip that returns
+   the banner when the cursor approaches the top edge. */
+.glass-banner-trigger {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 49;
+  pointer-events: auto;
+}
+
+/* Push the site content down by the banner height when visible. The
+   spacer is painted pitch-dark so the top 68-72px of any page is pitch
+   regardless of the section surface directly below it — this is what
+   the glass banner is composited over at the top of scroll. */
+.glass-banner-spacer {
+  height: 68px;
+  background: var(--pitch);
+}
+
+@media (min-width: 768px) {
+  .glass-banner-spacer { height: 72px; }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Comet-glow perimeter — chapter 4 coachable-moments block.
+   Two opposing glows rotate around the element's border via a
+   conic-gradient mask. JS drives rotation speed + direction via
+   --comet-angle and --comet-speed custom properties.
+   ────────────────────────────────────────────────────────────── */
+.comet-frame {
+  position: relative;
+  isolation: isolate;
+  --comet-angle: 0deg;
+  --comet-opacity: 0.9;
+  border-radius: 14px;
+}
+
+.comet-frame::before,
+.comet-frame::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--comet-angle),
+    transparent 0deg,
+    transparent 64deg,
+    rgba(181, 255, 93, calc(var(--comet-opacity) * 0.65)) 82deg,
+    rgba(181, 255, 93, var(--comet-opacity)) 96deg,
+    rgba(181, 255, 93, 0.18) 118deg,
+    transparent 156deg,
+    transparent 244deg,
+    rgba(181, 255, 93, calc(var(--comet-opacity) * 0.65)) 262deg,
+    rgba(181, 255, 93, var(--comet-opacity)) 276deg,
+    rgba(181, 255, 93, 0.18) 298deg,
+    transparent 336deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity 280ms ease;
+}
+
+.comet-frame::after {
+  filter: blur(10px);
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comet-frame::before,
+  .comet-frame::after {
+    background: none;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Mechanical-in — for the chapter 4 coachable-moments block
+   entrance. 3-stage: corner brackets draw → body fades up →
+   glow ignites. Stages driven by data-stage attribute.
+   ────────────────────────────────────────────────────────────── */
+.mech-frame {
+  position: relative;
+}
+
+.mech-frame .mech-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(181, 255, 93, 0.6);
+  opacity: 0;
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mech-frame .mech-corner.tl { top: -2px; left: -2px; border-right: none; border-bottom: none; transform: translate(6px, 6px); }
+.mech-frame .mech-corner.tr { top: -2px; right: -2px; border-left: none; border-bottom: none; transform: translate(-6px, 6px); }
+.mech-frame .mech-corner.bl { bottom: -2px; left: -2px; border-right: none; border-top: none; transform: translate(6px, -6px); }
+.mech-frame .mech-corner.br { bottom: -2px; right: -2px; border-left: none; border-top: none; transform: translate(-6px, -6px); }
+
+.mech-frame[data-stage="1"] .mech-corner,
+.mech-frame[data-stage="2"] .mech-corner,
+.mech-frame[data-stage="3"] .mech-corner {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.mech-frame .mech-body {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 620ms cubic-bezier(0.22, 1, 0.36, 1) 180ms,
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1) 180ms;
+}
+
+.mech-frame[data-stage="2"] .mech-body,
+.mech-frame[data-stage="3"] .mech-body {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Chapter 2 — role-lens expandable card
+   Each card has a compact face + an expanded panel. Width
+   animates via grid fr units on the parent for no-reflow smoothness.
+   ────────────────────────────────────────────────────────────── */
+.lens-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  transition: grid-template-columns 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  align-items: stretch;
+}
+
+.lens-grid[data-expanded="athlete"] { grid-template-columns: 2.4fr 1fr 1fr; }
+.lens-grid[data-expanded="coach"]   { grid-template-columns: 1fr 2.4fr 1fr; }
+.lens-grid[data-expanded="parent"]  { grid-template-columns: 1fr 1fr 2.4fr; }
+
+.lens-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 28rem;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(6, 16, 11, 0.08);
+  transition:
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.lens-card:hover,
+.lens-card[data-active="true"] {
+  border-color: rgba(6, 16, 11, 0.18);
+  box-shadow: 0 30px 80px -40px rgba(6, 16, 11, 0.28);
+}
+
+.lens-face {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.6rem;
+  min-height: 28rem;
+}
+
+.lens-widget {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(24px);
+  transition:
+    opacity 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 580ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lens-card[data-active="true"] .lens-widget {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.lens-card[data-active="true"] .lens-face {
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .lens-grid,
+  .lens-grid[data-expanded] {
+    grid-template-columns: 1fr;
+  }
+  .lens-face { min-height: auto; }
+  .lens-card { min-height: auto; }
+  /* On mobile the expand becomes a vertical reveal — widget renders
+     below the face instead of absolutely overlaying it. */
+  .lens-widget {
+    position: static;
+    transform: translateY(12px);
+  }
+  .lens-card[data-active="true"] .lens-face { opacity: 1; }
+}
+
+/* Signal accent used by the lens-card hover label */
+.lens-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--lime);
+  box-shadow: 0 0 0 4px rgba(181, 255, 93, 0.18);
 }

@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import {
   ArrowUpRight,
   CheckCircle2,
@@ -13,6 +15,12 @@ import { HeroBackdrop } from "@/components/marketing/hero-backdrop";
 import { Reveal } from "@/components/marketing/motion-primitives";
 import { PublicShell } from "@/components/marketing/public-shell";
 import { TransitionLink } from "@/components/marketing/transition-link";
+
+export const metadata: Metadata = {
+  title: "About Smartplay",
+  description:
+    "Serious soccer development should not depend on elite access. Built for athletes 13–19 and the adults around them — practical structure, honest AI, role-aware support.",
+};
 
 const principles = [
   {
@@ -63,10 +71,10 @@ export default function AboutPage() {
             <HeroBackdrop tone="pitch" />
             <div className="mx-auto max-w-[640px]">
               <div className="kicker kicker-lime">About Smartplay</div>
-              <h1 className="headline-mega mt-6 text-[clamp(3rem,7vw,5.5rem)] text-white">
+              <h1 className="t-display mt-6 max-w-[16ch] text-balance text-white">
                 Serious soccer development should not depend on elite access.
               </h1>
-              <p className="mt-8 max-w-xl text-[1.1rem] leading-8 text-white/64">
+              <p className="t-lede mt-8 max-w-xl text-pretty text-white/64">
                 Smartplay is built for student-athletes and the adults around
                 them: practical structure, honest AI, role-aware support, and
                 next actions that fit real life — without a pro-club budget.
@@ -87,7 +95,7 @@ export default function AboutPage() {
                 ].map((line) => (
                   <div
                     key={line}
-                    className="headline-tight text-[clamp(2rem,4vw,3rem)] text-[var(--on-chalk-1)]"
+                    className="t-h2 text-[var(--on-chalk-1)]"
                   >
                     {line}
                   </div>
@@ -118,16 +126,16 @@ export default function AboutPage() {
       </section>
 
       {/* Thesis — single composition, no stranded columns */}
-      <section data-surface="light" className="surface-chalk py-24 sm:py-32">
+      <section data-surface="light" className="surface-chalk section-pad">
         <div className="section-shell">
           {/* Intro — centered, calm, commands the section before principles appear */}
           <Reveal>
             <div className="mx-auto max-w-[820px] text-center">
               <div className="kicker kicker-pitch">The thesis</div>
-              <h2 className="headline mt-5 text-[clamp(2.6rem,5vw,4.4rem)] text-[var(--on-chalk-1)]">
+              <h2 className="t-display-sm mt-5 text-balance text-[var(--on-chalk-1)]">
                 A calm coach beside the athlete.
               </h2>
-              <p className="mx-auto mt-7 max-w-2xl text-[1.05rem] leading-8 text-[var(--on-chalk-3)]">
+              <p className="t-lede mx-auto mt-7 max-w-2xl text-pretty text-[var(--on-chalk-3)]">
                 Smartplay is not a hype app, not a medical tool, not a
                 pro-club simulator. It&apos;s a field-intelligence system
                 that helps the athlete, coach, and family make the next useful
@@ -167,7 +175,7 @@ export default function AboutPage() {
                         {p.n}
                       </span>
                     </div>
-                    <div className="headline mt-8 text-[1.55rem] text-[var(--on-chalk-1)]">
+                    <div className="t-h3 mt-8 text-[1.55rem] text-[var(--on-chalk-1)]">
                       {p.title}
                     </div>
                     <p className="mt-3 max-w-md text-[0.95rem] leading-7 text-[var(--on-chalk-3)]">
@@ -184,17 +192,17 @@ export default function AboutPage() {
       {/* Refuses — what we will not pretend */}
       <section
         data-surface="dark"
-        className="surface-pitch-gradient py-24 sm:py-32"
+        className="surface-pitch-gradient section-pad"
       >
         <div className="section-shell">
           <div className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:items-start">
             <Reveal>
               <div>
                 <div className="kicker kicker-lime">What we refuse to overclaim</div>
-                <h2 className="headline mt-5 max-w-[18ch] text-[clamp(2.4rem,4.4vw,3.75rem)] text-white">
+                <h2 className="t-display-sm mt-5 max-w-[18ch] text-balance text-white">
                   The list of things Smartplay will not pretend to do.
                 </h2>
-                <p className="mt-6 max-w-md text-[1rem] leading-7 text-white/60">
+                <p className="t-lede mt-6 max-w-md text-pretty text-white/62">
                   Trust is built by what a brand declines as much as by what
                   it ships. This page is here so families can read it before
                   they pay anything.
@@ -224,16 +232,16 @@ export default function AboutPage() {
       </section>
 
       {/* Promise */}
-      <section data-surface="light" className="surface-chalk py-24 sm:py-32">
+      <section data-surface="light" className="surface-chalk section-pad">
         <div className="section-shell">
           <div className="rounded-3xl border border-[var(--on-chalk-1)]/8 bg-white p-8 sm:p-12 lg:p-16">
             <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
               <div>
                 <div className="kicker kicker-pitch">Product promise</div>
-                <h2 className="headline mt-5 max-w-[20ch] text-[clamp(2.2rem,4vw,3.5rem)] text-[var(--on-chalk-1)]">
+                <h2 className="t-display-sm mt-5 max-w-[20ch] text-balance text-[var(--on-chalk-1)]">
                   Progress without perfectionism.
                 </h2>
-                <p className="mt-6 max-w-lg text-[1rem] leading-7 text-[var(--on-chalk-3)]">
+                <p className="t-lede mt-6 max-w-lg text-pretty text-[var(--on-chalk-3)]">
                   Smartplay gives the athlete a clearer picture of effort,
                   recovery, and improvement — while preserving the human
                   support system around them.

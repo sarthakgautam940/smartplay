@@ -1,6 +1,11 @@
 import { type ReactNode } from "react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function ChartCard({
   title,
@@ -18,7 +23,11 @@ export function ChartCard({
       <CardHeader>
         <div>
           <CardTitle>{title}</CardTitle>
-          {description ? <CardDescription className="mt-1">{description}</CardDescription> : null}
+          {description ? (
+            <p className="mt-1 text-[0.82rem] leading-6 text-white/55">
+              {description}
+            </p>
+          ) : null}
         </div>
         {action}
       </CardHeader>

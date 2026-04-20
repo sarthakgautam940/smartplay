@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+.next
+.vercel
+.turbo
+coverage
+*.log
+.env*.local
+docs
+*.md
+!README.md
