@@ -1,0 +1,6 @@
+- [Smartplay project context](project_smartplay.md) — this repo is Smartplay (youth soccer OS); ignore any UpLevel/agency framing
+- [Smartplay brand standard](project_smartplay_brand.md) — voice, color, type, motion, logo concept, banned tells
+- [Smartplay personas](project_smartplay_personas.md) — athlete (primary), parent buyer, coach/program decision maker
+- [User goals for Smartplay](project_smartplay_goals.md) — breathtaking UI, market ready, acquisition/IPO horizon 1-2yr
+- [Next.js 16 gotcha](project_nextjs16.md) — Next 16 has breaking changes; read `node_modules/next/dist/docs/` before API-heavy work
+- [User collaboration preferences](user_smartplay_collaboration.md) — autonomous mode, prefers action, expects psychology+marketing reasoning in design

@@ -1,0 +1,755 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────
+   Smartplay brand tokens
+   Calm, serious soccer performance system.
+   One accent (signal lime) — used only for action and meaning.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  /* Core surfaces */
+  --pitch: #06100b;
+  --pitch-2: #0a1814;
+  --pitch-3: #10241d;
+  --chalk: #f4f6ef;
+  --chalk-2: #eaeee1;
+  --chalk-3: #dde3d1;
+
+  /* Signal colors */
+  --lime: #b5ff5d;
+  --lime-soft: #d4ff9a;
+  --lime-deep: #7fc83a;
+  --ice: #cfe6f2;
+  --amber: #f5c36e;
+  --rose: #f5a6a6;
+
+  /* Text hierarchy on dark / light */
+  --on-pitch-1: #f7f8ef;
+  --on-pitch-2: rgba(247, 248, 239, 0.72);
+  --on-pitch-3: rgba(247, 248, 239, 0.52);
+  --on-pitch-4: rgba(247, 248, 239, 0.32);
+
+  --on-chalk-1: #06100b;
+  --on-chalk-2: #2d3a33;
+  --on-chalk-3: #56655c;
+  --on-chalk-4: #8b9790;
+
+  /* Shadcn-style tokens preserved for app shell */
+  --background: #f4f6ef;
+  --foreground: #0b1020;
+  --card: rgba(255, 255, 255, 0.75);
+  --card-foreground: #0b1020;
+  --muted: #6b7280;
+  --border: rgba(255, 255, 255, 0.5);
+  --ring: #b5ff5d;
+  --accent: #9bec00;
+  --accent-foreground: #07111d;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-space-grotesk);
+}
+
+.dark {
+  --background: #07111d;
+  --foreground: #f5f7ff;
+  --card: rgba(12, 20, 34, 0.78);
+  --card-foreground: #f5f7ff;
+  --muted: #9ca3af;
+  --border: rgba(255, 255, 255, 0.1);
+  --ring: #b5ff5d;
+  --accent: #b5ff5d;
+  --accent-foreground: #07111d;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  /* no smooth-scroll globally — it caused the first-scroll chop
+     (scroll-behavior interacts poorly with scroll-linked useTransform) */
+  scroll-behavior: auto;
+  /* lock scrollbar gutter so entering pages don't cause layout shift */
+  scrollbar-gutter: stable;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), sans-serif;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.section-shell {
+  @apply mx-auto w-full max-w-7xl px-5 sm:px-7 lg:px-10;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Public site shell
+   ────────────────────────────────────────────────────────────── */
+.public-site {
+  min-height: 100vh;
+  background: var(--chalk);
+  color: var(--on-chalk-1);
+  position: relative;
+  cursor: none;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .public-site {
+    cursor: auto;
+  }
+}
+
+.public-site a,
+.public-site button,
+.public-site input,
+.public-site textarea,
+.public-site select {
+  cursor: none;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .public-site a,
+  .public-site button,
+  .public-site input,
+  .public-site textarea,
+  .public-site select {
+    cursor: auto;
+  }
+}
+
+.public-noise {
+  position: relative;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Display typography
+   ────────────────────────────────────────────────────────────── */
+.headline {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.028em;
+  line-height: 0.95;
+}
+
+.headline-tight {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.032em;
+  line-height: 0.92;
+}
+
+.headline-mega {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+}
+
+.mono-xs {
+  font-family: ui-monospace, "JetBrains Mono", Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+
+.kicker {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.kicker-lime { color: var(--lime); }
+.kicker-ice { color: var(--ice); }
+.kicker-amber { color: var(--amber); }
+.kicker-pitch { color: #1a3a2a; }
+.kicker-chalk { color: var(--on-chalk-3); }
+
+/* ──────────────────────────────────────────────────────────────
+   Surfaces — `data-surface` attribute controls cursor auto-tone
+   ────────────────────────────────────────────────────────────── */
+.surface-pitch {
+  background: var(--pitch);
+  color: var(--on-pitch-1);
+}
+.surface-pitch[data-surface],
+.surface-pitch-gradient[data-surface],
+.surface-chalk[data-surface],
+.surface-chalk-2[data-surface] { /* marker class for JS cursor detection */ }
+
+.surface-pitch-gradient {
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(181, 255, 93, 0.08) 0%, transparent 48%),
+    radial-gradient(90% 60% at 0% 100%, rgba(207, 230, 242, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #06100b 0%, #0a1814 100%);
+  color: var(--on-pitch-1);
+}
+
+.surface-chalk {
+  background: var(--chalk);
+  color: var(--on-chalk-1);
+}
+
+.surface-chalk-2 {
+  background: linear-gradient(180deg, var(--chalk) 0%, var(--chalk-2) 100%);
+  color: var(--on-chalk-1);
+}
+
+.card-pitch {
+  background: rgba(10, 24, 20, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(18px);
+}
+
+.card-chalk {
+  background: #ffffff;
+  border: 1px solid rgba(6, 16, 11, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(6, 16, 11, 0.02), 0 18px 40px -20px rgba(6, 16, 11, 0.1);
+}
+
+.card-chalk-soft {
+  background: rgba(255, 255, 255, 0.64);
+  border: 1px solid rgba(6, 16, 11, 0.06);
+  border-radius: 12px;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Hero — signature composition
+   ────────────────────────────────────────────────────────────── */
+.hero-pitch {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(60% 80% at 82% 18%, rgba(181, 255, 93, 0.09) 0%, transparent 55%),
+    radial-gradient(55% 70% at 12% 90%, rgba(207, 230, 242, 0.05) 0%, transparent 60%),
+    linear-gradient(180deg, #06100b 0%, #081611 60%, #0a1814 100%);
+  color: var(--on-pitch-1);
+}
+
+.hero-pitch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 35%, black 35%, transparent 85%);
+  pointer-events: none;
+}
+
+/* Big signal beam behind headline — one dominant idea */
+.hero-beam {
+  position: absolute;
+  top: -10%;
+  right: -8%;
+  width: min(68vw, 780px);
+  height: min(68vw, 780px);
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 999px;
+  border: 1px solid rgba(181, 255, 93, 0.12);
+  background:
+    radial-gradient(closest-side, rgba(181, 255, 93, 0.1), transparent 70%);
+  will-change: transform;
+}
+
+.hero-beam::before {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero-beam::after {
+  content: "";
+  position: absolute;
+  inset: 44%;
+  border-radius: 999px;
+  border: 1px solid rgba(181, 255, 93, 0.18);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Buttons
+   ────────────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  height: 52px;
+  padding: 0 1.375rem;
+  border-radius: 10px;
+  background: var(--lime);
+  color: var(--pitch);
+  font-weight: 800;
+  font-size: 0.9375rem;
+  letter-spacing: -0.005em;
+  box-shadow: 0 10px 30px -12px rgba(181, 255, 93, 0.55);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background 180ms, box-shadow 180ms;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  background: var(--lime-soft);
+  box-shadow: 0 16px 40px -10px rgba(181, 255, 93, 0.6);
+}
+
+.btn-ghost-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 52px;
+  padding: 0 1.25rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--on-pitch-1);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: border-color 180ms, background 180ms, transform 180ms;
+}
+
+.btn-ghost-dark:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+.btn-ghost-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 52px;
+  padding: 0 1.25rem;
+  border-radius: 10px;
+  border: 1px solid rgba(6, 16, 11, 0.14);
+  background: transparent;
+  color: var(--on-chalk-1);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: border-color 180ms, background 180ms, transform 180ms;
+}
+
+.btn-ghost-light:hover {
+  border-color: rgba(6, 16, 11, 0.32);
+  background: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+}
+
+.focus-ring:focus-visible {
+  outline-color: var(--lime);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Grids & detail treatments
+   ────────────────────────────────────────────────────────────── */
+.grid-pitch {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.grid-chalk {
+  background-image:
+    linear-gradient(rgba(6, 16, 11, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 16, 11, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.hairline-on-dark { border-color: rgba(255, 255, 255, 0.08); }
+.hairline-on-light { border-color: rgba(6, 16, 11, 0.08); }
+
+/* ──────────────────────────────────────────────────────────────
+   Page transition
+   ────────────────────────────────────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 340ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Fluid cursor visibility tweak — it uses mix-blend-mode
+   ────────────────────────────────────────────────────────────── */
+.cursor-dot,
+.cursor-ring {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  will-change: transform;
+  mix-blend-mode: difference;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Motion utilities
+   ────────────────────────────────────────────────────────────── */
+@keyframes signal-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes beam-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-1%, 1%); }
+}
+
+@keyframes marquee-slide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.signal-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--lime);
+  box-shadow: 0 0 0 4px rgba(181, 255, 93, 0.2);
+  animation: signal-pulse 2.2s ease-in-out infinite;
+}
+
+.beam-drift {
+  animation: beam-drift 14s ease-in-out infinite;
+}
+
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-slide 36s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .signal-dot, .beam-drift, .marquee {
+    animation: none !important;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Tactical film-strip clip thumbnail
+   ────────────────────────────────────────────────────────────── */
+.film-thumb {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, #0c1f18 0%, #12332a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.film-thumb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 14px 14px;
+  opacity: 0.55;
+  mask-image: linear-gradient(180deg, black, transparent);
+}
+
+/* Divider treatments */
+.hair-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+}
+
+.hair-divider-light {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(6, 16, 11, 0.14), transparent);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Hero v2 — live decision environment
+   A pitch turned into a decision surface, not a container.
+   ────────────────────────────────────────────────────────────── */
+
+.tactical-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* One directional gradient sweep — left→right flow */
+  background:
+    linear-gradient(92deg,
+      rgba(6, 16, 11, 0) 0%,
+      rgba(6, 16, 11, 0) 38%,
+      rgba(181, 255, 93, 0.04) 72%,
+      rgba(181, 255, 93, 0.07) 100%);
+}
+
+.tactical-field::before {
+  /* subtle pitch stripes, left→right flow */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 148px,
+    rgba(255, 255, 255, 0.015) 148px,
+    rgba(255, 255, 255, 0.015) 149px
+  );
+  mask-image: linear-gradient(
+    100deg,
+    transparent 0%,
+    black 45%,
+    black 82%,
+    transparent 100%
+  );
+}
+
+.tactical-field::after {
+  /* Faint center-circle arc fragment, anchoring the right third */
+  content: "";
+  position: absolute;
+  right: -14%;
+  top: 50%;
+  width: min(58vw, 640px);
+  height: min(58vw, 640px);
+  border-radius: 999px;
+  border: 1px solid rgba(181, 255, 93, 0.09);
+  transform: translateY(-50%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 0 120px rgba(181, 255, 93, 0.03);
+}
+
+.tactical-arc {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Floating data chip — free, not boxed. Monospace, tactical */
+.data-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: ui-monospace, "JetBrains Mono", Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(6, 16, 11, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  color: rgba(247, 248, 239, 0.82);
+  white-space: nowrap;
+  box-shadow: 0 4px 18px -6px rgba(0, 0, 0, 0.4);
+}
+
+.data-chip[data-tone="lime"] {
+  border-color: rgba(181, 255, 93, 0.32);
+  color: var(--lime);
+}
+
+.data-chip[data-tone="amber"] {
+  border-color: rgba(245, 195, 110, 0.32);
+  color: var(--amber);
+}
+
+.data-chip[data-tone="ice"] {
+  border-color: rgba(207, 230, 242, 0.32);
+  color: var(--ice);
+}
+
+.data-chip .data-chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Live-data flicker — subtle, not gimmicky */
+@keyframes live-flicker {
+  0%, 100% { opacity: 1; }
+  24% { opacity: 0.82; }
+  52% { opacity: 1; }
+  56% { opacity: 0.92; }
+  88% { opacity: 1; }
+}
+
+.flicker {
+  animation: live-flicker 6s ease-in-out infinite;
+}
+
+/* Breathing — slow, tension-holding, not bouncy */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.025); opacity: 1; }
+}
+
+.breathe {
+  animation: breathe 4.6s ease-in-out infinite;
+}
+
+/* Heat trace — pulsing danger/opportunity zone */
+@keyframes heat-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.96); }
+  50% { opacity: 0.85; transform: scale(1.05); }
+}
+
+.heat-zone {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center,
+      rgba(245, 110, 110, 0.26) 0%,
+      rgba(245, 110, 110, 0.14) 34%,
+      transparent 62%);
+  filter: blur(18px);
+  animation: heat-pulse 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.heat-zone[data-tone="opportunity"] {
+  background:
+    radial-gradient(circle at center,
+      rgba(181, 255, 93, 0.24) 0%,
+      rgba(181, 255, 93, 0.12) 34%,
+      transparent 62%);
+}
+
+/* Dashed tactical path — animates the dash offset */
+@keyframes path-flow {
+  to { stroke-dashoffset: -24; }
+}
+
+.ink-path {
+  stroke-dasharray: 4 6;
+  animation: path-flow 2.4s linear infinite;
+}
+
+/* Scribble underline — hand-drawn feel, draws on load */
+@keyframes scribble-draw {
+  0%   { stroke-dashoffset: 260; opacity: 0; }
+  18%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.scribble-underline {
+  position: absolute;
+  inset: auto 0 -0.28em 0;
+  width: 100%;
+  height: 0.42em;
+  pointer-events: none;
+}
+
+.scribble-underline path {
+  fill: none;
+  stroke: var(--lime);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 260;
+  stroke-dashoffset: 260;
+  animation: scribble-draw 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+}
+
+.scribble-underline path:nth-child(2) {
+  animation-delay: 0.9s;
+  stroke-width: 2;
+  opacity: 0.55;
+}
+
+/* Hand-drawn asterisk glyph for headline accent */
+@keyframes glyph-draw {
+  0% { stroke-dashoffset: 80; opacity: 0; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.glyph-sketch path,
+.glyph-sketch line {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  animation: glyph-draw 1.4s cubic-bezier(0.22, 1, 0.36, 1) 1.1s forwards;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Tactical cursor (overrides the dot+ring)
+   ────────────────────────────────────────────────────────────── */
+.cursor-reticle,
+.cursor-trail-canvas {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  will-change: transform;
+}
+
+.cursor-trail-canvas {
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  /* No blend mode — `screen` was hiding the dark-green trail on chalk
+     surfaces (screen lightens, so dark colors disappear into white). */
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Section transition & reveal helpers
+   ────────────────────────────────────────────────────────────── */
+.will-change-transform { will-change: transform; }
+
+/* Pulse timing for live dot variants */
+@keyframes dot-pulse {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.6; }
+}
+
+.dot-pulse {
+  animation: dot-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flicker, .breathe, .heat-zone, .ink-path, .dot-pulse {
+    animation: none !important;
+  }
+  .scribble-underline path {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .glyph-sketch path, .glyph-sketch line {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}

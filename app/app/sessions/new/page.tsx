@@ -1,0 +1,23 @@
+import { SessionForm } from "@/components/forms/session-form";
+import { getAthleteWorkspace } from "@/lib/data/service";
+import { Card } from "@/components/ui/card";
+
+export default async function NewSessionPage() {
+  const viewer = { id: "user-athlete-maya", role: "athlete" as const };
+  const workspace = await getAthleteWorkspace(viewer.id);
+
+  return (
+    <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <SessionForm athleteId={workspace.athlete.user.id} />
+      <Card className="space-y-4">
+        <div className="font-display text-2xl font-semibold text-white">Suggested templates</div>
+        {workspace.sessions.templates.map((template) => (
+          <div key={template.title} className="rounded-2xl border border-white/8 bg-white/5 p-4">
+            <div className="font-medium text-white">{template.title}</div>
+            <div className="mt-1 text-sm text-slate-400">{template.description}</div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
