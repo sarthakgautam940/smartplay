@@ -51,35 +51,42 @@ export default async function DashboardPage() {
           />
         </ChartCard>
 
-        <Card className="space-y-4">
-          <div className="text-sm uppercase tracking-[0.24em] text-lime-200">Alerts</div>
+        <Card className="space-y-3">
+          <div className="mono-xs uppercase tracking-[0.22em] text-[var(--lime)]/80">
+            Alerts
+          </div>
           {workspace.dashboard.alerts.map((alert) => (
-            <div key={alert} className="rounded-2xl border border-white/8 bg-white/5 p-4 text-sm text-slate-200">
+            <div
+              key={alert}
+              className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-[0.88rem] leading-6 text-white/72"
+            >
               {alert}
             </div>
           ))}
-          <div className="rounded-2xl border border-lime-400/20 bg-lime-400/10 p-4 text-sm text-lime-100">
+          <div className="rounded-xl border border-[var(--lime)]/22 bg-[var(--lime)]/6 p-4 text-[0.88rem] leading-6 text-[var(--lime)]">
             {workspace.dashboard.recommendedToday}
           </div>
         </Card>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <Card className="space-y-4">
-          <div className="font-display text-xl font-semibold text-white">Recent sessions</div>
+        <Card className="space-y-3">
+          <div className="font-display text-[1.05rem] font-semibold tracking-[-0.015em] text-white">
+            Recent sessions
+          </div>
           {workspace.dashboard.recentSessions.map((session) => (
             <div
               key={session.id}
-              className="rounded-2xl border border-white/8 bg-white/5 p-4"
+              className="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-white/18"
             >
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-medium text-white">{session.title}</div>
-                  <div className="mt-1 text-sm text-slate-400">
+                  <div className="mt-1 text-[0.82rem] text-white/52">
                     {session.location} · {formatShortDate(session.occurredAt)}
                   </div>
                 </div>
-                <div className="text-sm text-lime-200">
+                <div className="mono-xs font-bold uppercase text-[var(--lime)]">
                   {session.metric?.trainingLoad ?? 0} AU
                 </div>
               </div>
@@ -87,15 +94,17 @@ export default async function DashboardPage() {
           ))}
         </Card>
 
-        <Card className="space-y-4">
-          <div className="font-display text-xl font-semibold text-white">Upcoming schedule</div>
+        <Card className="space-y-3">
+          <div className="font-display text-[1.05rem] font-semibold tracking-[-0.015em] text-white">
+            Upcoming schedule
+          </div>
           {workspace.dashboard.upcomingEvents.map((event) => (
             <div
               key={event.id}
-              className="rounded-2xl border border-white/8 bg-white/5 p-4"
+              className="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-white/18"
             >
               <div className="font-medium text-white">{event.title}</div>
-              <div className="mt-1 text-sm text-slate-400">
+              <div className="mt-1 text-[0.82rem] text-white/52">
                 {formatRelativeDate(event.startsAt)}
               </div>
             </div>

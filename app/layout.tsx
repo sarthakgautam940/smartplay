@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
 
 import { AppProviders } from "@/components/providers/app-providers";
@@ -14,10 +14,63 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://smartplay.app";
+
 export const metadata: Metadata = {
-  title: "SmartPlay | Youth Soccer Training Intelligence",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Smartplay — Youth soccer performance intelligence",
+    template: "%s — Smartplay",
+  },
   description:
-    "SmartPlay connects youth soccer training, wellness, nutrition, mindset, goals, video review, and coach feedback in one practical athlete development system.",
+    "Smartplay ties a serious soccer week together — session, recovery, film, mindset — and gives athletes, coaches, and parents a view that fits them.",
+  applicationName: "Smartplay",
+  keywords: [
+    "youth soccer",
+    "athlete development",
+    "training log",
+    "performance analytics",
+    "recovery",
+    "video review",
+    "coach software",
+    "parent view",
+  ],
+  authors: [{ name: "Smartplay" }],
+  creator: "Smartplay",
+  publisher: "Smartplay",
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "Smartplay",
+    title: "Smartplay — Youth soccer performance intelligence",
+    description:
+      "The week works harder when it's specific. Built for athletes 13–19 and the adults around them.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Smartplay — Youth soccer performance intelligence",
+    description:
+      "The week works harder when it's specific. Built for athletes 13–19 and the adults around them.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+  icons: {
+    icon: "/icon.svg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#06100b",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

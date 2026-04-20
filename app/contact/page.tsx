@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import {
   ArrowUpRight,
   Building2,
@@ -11,6 +13,12 @@ import { ContactIntakeCard } from "@/components/marketing/contact-intake-card";
 import { HeroBackdrop } from "@/components/marketing/hero-backdrop";
 import { Reveal } from "@/components/marketing/motion-primitives";
 import { PublicShell } from "@/components/marketing/public-shell";
+
+export const metadata: Metadata = {
+  title: "Contact Smartplay",
+  description:
+    "Pilot Smartplay with coaches, schools, clubs, nonprofits, and community programs. Email starts a specific conversation — not a generic demo.",
+};
 
 const paths = [
   {
@@ -66,13 +74,13 @@ export default function ContactPage() {
         className="surface-pitch-gradient relative overflow-hidden"
       >
         <HeroBackdrop tone="pitch" />
-        <div className="section-shell relative z-10 grid gap-14 py-24 sm:py-32 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:py-36">
+        <div className="section-shell relative z-10 grid gap-14 section-pad lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div className="max-w-3xl">
             <div className="kicker kicker-lime">Contact</div>
-            <h1 className="headline-mega mt-6 text-[clamp(3rem,7vw,6rem)] text-white">
+            <h1 className="t-display mt-6 max-w-[18ch] text-balance text-white">
               Pilot Smartplay with the athletes who need it now.
             </h1>
-            <p className="mt-8 max-w-xl text-[1.1rem] leading-8 text-white/64">
+            <p className="t-lede mt-8 max-w-xl text-pretty text-white/64">
               For coaches, schools, clubs, nonprofits, and community programs
               exploring a practical youth soccer performance system — not a
               generic demo.
@@ -89,16 +97,16 @@ export default function ContactPage() {
       </section>
 
       {/* Paths */}
-      <section data-surface="light" className="surface-chalk py-24 sm:py-28">
+      <section data-surface="light" className="surface-chalk section-pad-sm">
         <div className="section-shell">
           <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
             <div className="max-w-xl">
               <div className="kicker kicker-pitch">Pilot paths</div>
-              <h2 className="headline mt-5 text-[clamp(2.2rem,4vw,3.5rem)] text-[var(--on-chalk-1)]">
+              <h2 className="t-display-sm mt-5 text-balance text-[var(--on-chalk-1)]">
                 The conversation starts with who you support.
               </h2>
             </div>
-            <p className="max-w-sm text-[1rem] leading-7 text-[var(--on-chalk-3)]">
+            <p className="t-lede max-w-sm text-pretty text-[var(--on-chalk-3)]">
               Smartplay is early enough to shape around real deployment needs.
               The goal isn&apos;t a generic demo. It&apos;s a useful first week.
             </p>
@@ -118,7 +126,7 @@ export default function ContactPage() {
                         {p.bullet}
                       </span>
                     </div>
-                    <div className="headline mt-7 text-[1.55rem] text-[var(--on-chalk-1)]">
+                    <div className="t-h3 mt-7 text-[1.55rem] text-[var(--on-chalk-1)]">
                       {p.title}
                     </div>
                     <p className="mt-3 text-[0.92rem] leading-7 text-[var(--on-chalk-3)]">
@@ -135,17 +143,17 @@ export default function ContactPage() {
       {/* Real channel */}
       <section
         data-surface="dark"
-        className="surface-pitch-gradient py-24 sm:py-28"
+        className="surface-pitch-gradient section-pad-sm"
       >
         <div className="section-shell">
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12 lg:p-16">
             <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
               <div>
                 <div className="kicker kicker-lime">Reliable channel</div>
-                <h2 className="headline mt-5 max-w-[20ch] text-[clamp(2.2rem,4.4vw,3.5rem)] text-white">
+                <h2 className="t-display-sm mt-5 max-w-[20ch] text-balance text-white">
                   Send a real note. Get a real pilot conversation.
                 </h2>
-                <p className="mt-6 max-w-xl text-[1rem] leading-7 text-white/62">
+                <p className="t-lede mt-6 max-w-xl text-pretty text-white/62">
                   Email keeps the first conversation specific — who you
                   support, what&apos;s hard right now, and what a useful first
                   week should prove.
@@ -155,7 +163,7 @@ export default function ContactPage() {
                 <div className="mono-xs uppercase text-[var(--lime)]/80">
                   Write to
                 </div>
-                <div className="headline mt-2 text-[1.4rem] text-white">
+                <div className="t-h3 mt-2 text-[1.4rem] text-white">
                   contact.smartplay@gmail.com
                 </div>
                 <a href={mailto} className="btn-primary focus-ring mt-6 w-full">

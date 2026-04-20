@@ -50,25 +50,37 @@ export function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-72 shrink-0 flex-col border-r border-white/10 bg-slate-950/70 p-5 lg:flex">
-      <Link href="/" className="flex items-center gap-3">
-        <div className="flex size-11 items-center justify-center rounded-2xl bg-lime-400 text-lg font-black text-slate-950">
+    <aside
+      className="hidden w-72 shrink-0 flex-col border-r p-5 lg:flex"
+      style={{
+        borderColor: "rgba(255,255,255,0.06)",
+        background:
+          "linear-gradient(180deg, rgba(6,16,11,0.9) 0%, rgba(8,22,18,0.88) 100%)",
+      }}
+    >
+      <Link href="/" className="group flex items-center gap-3">
+        <div className="grid size-11 place-items-center rounded-[12px] bg-[var(--lime)] text-lg font-black text-[var(--pitch)] transition group-hover:scale-[1.04]">
           SP
         </div>
         <div>
-          <div className="font-display text-xl font-semibold text-white">SmartPlay</div>
-          <div className="text-xs uppercase tracking-[0.24em] text-lime-200">Athlete OS</div>
+          <div className="font-display text-[1.15rem] font-semibold text-white">
+            Smartplay
+          </div>
+          <div className="mono-xs uppercase tracking-[0.22em] text-[var(--lime)]/75">
+            Athlete OS
+          </div>
         </div>
       </Link>
 
       <div className="mt-8 flex items-center gap-2">
         <Badge>{role}</Badge>
-        <Badge variant="secondary">Demo-ready</Badge>
+        <Badge variant="secondary">Live</Badge>
       </div>
 
-      <nav className="mt-8 flex flex-col gap-2">
+      <nav className="mt-8 flex flex-col gap-1">
         {links.map((link) => {
-          const Icon = iconMap[link.label as keyof typeof iconMap] ?? LayoutDashboard;
+          const Icon =
+            iconMap[link.label as keyof typeof iconMap] ?? LayoutDashboard;
           const active = pathname === link.href;
 
           return (
@@ -76,23 +88,33 @@ export function Sidebar({
               key={link.href}
               href={link.href}
               className={cn(
-                "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-slate-300 transition hover:bg-white/6 hover:text-white",
-                active && "bg-lime-400 text-slate-950 hover:bg-lime-400 hover:text-slate-950",
+                "group relative flex items-center gap-3 rounded-[10px] px-4 py-2.5 text-[0.88rem] font-medium transition-colors",
+                active
+                  ? "bg-[var(--lime)] text-[var(--pitch)]"
+                  : "text-white/62 hover:bg-white/5 hover:text-white",
               )}
             >
-              <Icon className="size-4" />
+              {/* Active-state pip */}
+              {active ? null : (
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-1/2 h-5 w-[2px] -translate-y-1/2 scale-y-0 rounded-r-full bg-[var(--lime)] transition-transform duration-300 group-hover:scale-y-100"
+                />
+              )}
+              <Icon className="size-4" strokeWidth={active ? 2.4 : 2} />
               <span>{link.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto rounded-[28px] border border-white/10 bg-gradient-to-br from-white/6 to-white/0 p-5">
-        <div className="text-xs uppercase tracking-[0.24em] text-lime-200">
-          Equity-first
+      <div className="mt-auto rounded-[18px] border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/0 p-5">
+        <div className="mono-xs uppercase tracking-[0.22em] text-[var(--lime)]/75">
+          Access-first
         </div>
-        <p className="mt-3 text-sm text-slate-300">
-          Equipment-light drills, affordable meal ideas, and home-session planning are built into the workflow.
+        <p className="mt-3 text-[0.82rem] leading-6 text-white/62">
+          Equipment-light drills, budget meals, and home-session planning are
+          built into the workflow — not bolted on.
         </p>
       </div>
     </aside>

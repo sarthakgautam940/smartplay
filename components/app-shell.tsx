@@ -27,41 +27,51 @@ export function AppShell({
   const sessionRole = session?.user?.role as AppRole | undefined;
   const activeRole = role ?? sessionRole ?? "athlete";
   const activeUser = user ?? {
-    name: session?.user?.name ?? "SmartPlay User",
+    name: session?.user?.name ?? "Smartplay athlete",
     email: session?.user?.email,
     image: session?.user?.image,
   };
 
   const titleMap: Record<string, { title: string; subtitle: string }> = {
     "/app/dashboard": {
-      title: "Athlete Dashboard",
-      subtitle: "Train smarter, not just harder.",
+      title: "This week",
+      subtitle: "The rhythm behind the work — one screen, not eight tabs.",
     },
     "/app/coach": {
-      title: "Coach Command Center",
-      subtitle: "See the roster clearly, coach proactively, and keep athletes progressing.",
+      title: "Roster",
+      subtitle: "Readiness, submitted clips, and the next coaching decision.",
     },
     "/app/parent": {
-      title: "Parent Overview",
-      subtitle: "Support consistency without turning progress into pressure.",
+      title: "Family view",
+      subtitle: "Support without taking over. Calendar, recovery, and room to ask.",
     },
     "/app/admin": {
-      title: "Admin Snapshot",
-      subtitle: "Track adoption, program health, and athlete support needs.",
+      title: "Program snapshot",
+      subtitle: "Adoption, program health, and where support is needed now.",
     },
   };
 
   const titleEntry =
     Object.entries(titleMap).find(([path]) => pathname.startsWith(path))?.[1] ?? {
-      title: "SmartPlay Workspace",
+      title: "Workspace",
       subtitle: "Performance, wellness, and mindset in one place.",
     };
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-white">
+    <div
+      className="flex min-h-screen text-[var(--on-pitch-1)]"
+      style={{
+        background:
+          "radial-gradient(120% 60% at 100% 0%, rgba(181,255,93,0.05) 0%, transparent 55%), linear-gradient(180deg, #06100b 0%, #081712 100%)",
+      }}
+    >
       <Sidebar role={activeRole} links={roleNavigation[activeRole]} />
       <div className="flex min-h-screen flex-1 flex-col">
-        <TopNav title={titleEntry.title} subtitle={titleEntry.subtitle} user={activeUser} />
+        <TopNav
+          title={titleEntry.title}
+          subtitle={titleEntry.subtitle}
+          user={activeUser}
+        />
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
     </div>
